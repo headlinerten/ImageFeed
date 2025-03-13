@@ -1,7 +1,5 @@
 import UIKit
 
-import UIKit
-
 final class ProfileViewController: UIViewController {
     // MARK: - UI Elements
     
@@ -9,7 +7,7 @@ final class ProfileViewController: UIViewController {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "avatar")
         imageView.tintColor = .gray
-
+        
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
@@ -43,9 +41,12 @@ final class ProfileViewController: UIViewController {
     
     private let logoutButton: UIButton = {
         let image = UIImage(systemName: "ipad.and.arrow.forward")
-        let button = UIButton.systemButton(with: image!, target: nil, action: nil)
+        let button = UIButton.systemButton(
+            with: image ?? UIImage(),
+            target: nil,
+            action: nil
+        )
         button.tintColor = .ypRed
-        
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -54,7 +55,7 @@ final class ProfileViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         view.backgroundColor = UIColor(
             red: 26/255,
             green: 27/255,
@@ -69,11 +70,10 @@ final class ProfileViewController: UIViewController {
     // MARK: - Setup Methods
     
     private func setupUI() {
-        view.addSubview(profileImageView)
-        view.addSubview(nameLabel)
-        view.addSubview(usernameLabel)
-        view.addSubview(bioLabel)
-        view.addSubview(logoutButton)
+        [profileImageView, nameLabel, usernameLabel, bioLabel, logoutButton].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview($0)
+        }
     }
     
     private func setupConstraints() {
