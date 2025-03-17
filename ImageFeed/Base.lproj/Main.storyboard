@@ -272,7 +272,7 @@
                                     <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="YES"/>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <segue destination="1Kf-gf-vlU" kind="presentation" identifier="ShowWebView" id="bRE-5f-cpq"/>
+                                    <segue destination="1Kf-gf-vlU" kind="presentation" identifier="showWebView" modalPresentationStyle="fullScreen" id="V6P-JH-bIu"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -301,11 +301,11 @@
             <objects>
                 <viewController id="1Kf-gf-vlU" customClass="WebViewViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="fw4-Md-lvu">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="842"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <wkWebView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="rcp-ax-YLT" customClass="WKWebVView">
-                                <rect key="frame" x="0.0" y="0.0" width="393" height="842"/>
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <wkWebViewConfiguration key="configuration">
                                     <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
@@ -325,7 +325,7 @@
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="plain" image="nav_back_button"/>
                                 <connections>
-                                    <action selector="backButtonTapped:" destination="1Kf-gf-vlU" eventType="touchUpInside" id="pIn-kB-ihT"/>
+                                    <action selector="backButtonTapped:" destination="1Kf-gf-vlU" eventType="touchUpInside" id="CQc-zV-CRy"/>
                                 </connections>
                             </button>
                         </subviews>
