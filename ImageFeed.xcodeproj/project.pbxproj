@@ -21,6 +21,21 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		200726142D87DC42003EBA41 /* - Constants */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "- Constants";
+			sourceTree = "<group>";
+		};
+		200726172D87DCD9003EBA41 /* - Protocols */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "- Protocols";
+			sourceTree = "<group>";
+		};
+		2007261C2D87DD9A003EBA41 /* - ViewControllers */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "- ViewControllers";
+			sourceTree = "<group>";
+		};
 		2023CFD82D17384400EAC095 /* ImageFeed */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -45,6 +60,9 @@
 		2023CFCD2D17384400EAC095 = {
 			isa = PBXGroup;
 			children = (
+				2007261C2D87DD9A003EBA41 /* - ViewControllers */,
+				200726172D87DCD9003EBA41 /* - Protocols */,
+				200726142D87DC42003EBA41 /* - Constants */,
 				2023CFD82D17384400EAC095 /* ImageFeed */,
 				2023CFD72D17384400EAC095 /* Products */,
 			);
@@ -74,6 +92,9 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				200726142D87DC42003EBA41 /* - Constants */,
+				200726172D87DCD9003EBA41 /* - Protocols */,
+				2007261C2D87DD9A003EBA41 /* - ViewControllers */,
 				2023CFD82D17384400EAC095 /* ImageFeed */,
 			);
 			name = ImageFeed;
