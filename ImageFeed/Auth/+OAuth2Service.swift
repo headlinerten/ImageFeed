@@ -13,7 +13,8 @@ final class OAuth2Service {
     // MARK: - Запрос Токена
     func makeOAuthTokenRequest(code: String) -> URLRequest? {
         guard let baseURL = URL(string: "https://unsplash.com") else {
-            fatalError("Invalid base URL")
+            print("Ошибка: неверный базовый URL")
+            return nil
         }
         
         var components = URLComponents()
@@ -28,8 +29,10 @@ final class OAuth2Service {
             URLQueryItem(name: "code", value: code),
             URLQueryItem(name: "grant_type", value: "authorization_code")
         ]
+        
         guard let url = components.url else {
-            fatalError("Failed to construct URL from components")
+            print("Ошибка: не удалось сформировать URL из компонентов")
+            return nil
         }
         
         var request = URLRequest(url: url)
@@ -50,7 +53,9 @@ final class OAuth2Service {
     // MARK: - Извлечение токена
     func fetchAuthToken(code: String, completion: @escaping (Result<String, OAuthError>) -> Void) {
         guard let request = makeOAuthTokenRequest(code: code) else {
-            completion(.failure(.invalidRequest))
+            DispatchQueue.main.async {
+                completion(.failure(.invalidRequest))
+            }
             return
         }
         

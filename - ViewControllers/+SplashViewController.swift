@@ -14,7 +14,7 @@ final class SplashViewController: UIViewController {
             switchTabBarController()
         } else {
             performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
-        }
+        }		
     }
     
     // MARK: - Навигация
@@ -51,8 +51,8 @@ extension SplashViewController {
 // MARK: - AuthViewControllerDelegate
 extension SplashViewController: AuthViewControllerDelegate {
     func didAuthenticate(_ vc: AuthViewController) {
-        vc.dismiss(animated: true) { [weak self] in
-            self?.switchTabBarController()
+        vc.dismiss(animated: true) {
+            self.switchTabBarController()
         }
     }
 }

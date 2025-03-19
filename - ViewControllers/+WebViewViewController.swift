@@ -8,9 +8,9 @@ enum WebViewConstants {
 
 final class WebViewViewController: UIViewController {
     
-    @IBOutlet  var webView: WKWebView!
-    @IBOutlet  var progressView: UIProgressView!
-    @IBOutlet weak var backButton: UIButton!
+    @IBOutlet private var webView: WKWebView!
+    @IBOutlet private var progressView: UIProgressView!
+    @IBOutlet private var backButton: UIButton!
     
     weak var delegate: WebViewViewControllerDelegate?
     

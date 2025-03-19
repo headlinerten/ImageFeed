@@ -13,6 +13,7 @@ final class AuthViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        configureBackButton()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -40,7 +41,7 @@ extension AuthViewController: WebViewViewControllerDelegate {
         print("Code: \(code)")
         
         oauth2Service.fetchAuthToken(code: code) { [weak self] result in
-            guard let self = self else { return }
+            guard let self else { return }
             
             DispatchQueue.main.async {
                 switch result {
@@ -68,6 +69,13 @@ extension AuthViewController: WebViewViewControllerDelegate {
                 }
             }
         }
+    }
+    
+    private func configureBackButton() {
+        navigationController?.navigationBar.backIndicatorImage = UIImage(named: "nav_back_button") // 1
+        navigationController?.navigationBar.backIndicatorTransitionMaskImage = UIImage(named: "nav_back_button") // 2
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil) // 3
+        navigationItem.backBarButtonItem?.tintColor = UIColor(named: "YP Black") // 4
     }
     
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
