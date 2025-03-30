@@ -1,5 +1,5 @@
 import UIKit
-import Foundation
+import ProgressHUD
 
 final class AuthViewController: UIViewController {
     
@@ -40,8 +40,10 @@ extension AuthViewController: WebViewViewControllerDelegate {
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
         print("Code: \(code)")
         
+        ProgressHUD.animate()
         oauth2Service.fetchAuthToken(code: code) { [weak self] result in
             guard let self else { return }
+            ProgressHUD.dismiss()
             
             DispatchQueue.main.async {
                 switch result {
