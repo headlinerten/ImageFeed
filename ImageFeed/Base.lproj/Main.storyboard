@@ -318,7 +318,7 @@
         <!--Web View View Controller-->
         <scene sceneID="Gkv-bw-vdT">
             <objects>
-                <viewController id="lIg-nX-Q5n" customClass="WebViewViewController" customModule="Image_Feed" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="lIg-nX-Q5n" customClass="WebViewViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="IFi-je-nLV">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
