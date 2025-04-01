@@ -8,7 +8,9 @@ final class OAuth2Service {
     private let storage = OAuth2TokenStorage()
     private init() {}
     
-    
+    // MARK: - Защита от гонок
+      private var task: URLSessionTask?
+      private var lastCode: String?
     
     // MARK: - Запрос Токена
     func makeOAuthTokenRequest(code: String) -> URLRequest? {
@@ -50,71 +52,92 @@ final class OAuth2Service {
         
     }
     
-    // MARK: - Извлечение токена
+    // MARK: - Получение токена с обработкой гонок
     func fetchAuthToken(code: String, completion: @escaping (Result<String, OAuthError>) -> Void) {
-        guard let request = makeOAuthTokenRequest(code: code) else {
-            DispatchQueue.main.async {
-                completion(.failure(.invalidRequest))
-            }
-            return
-        }
-        
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                DispatchQueue.main.async {
-                    completion(.failure(.networkError(error)))
-                    print(error.localizedDescription)
+            // Гарантируем, что вызов происходит из главного потока для безопасного доступа к task и lastCode
+            assert(Thread.isMainThread)
+            
+            // Если уже выполняется запрос
+            if let _ = task {
+                if lastCode != code {
+                    // Если код отличается, предыдущий запрос больше не актуален — отменяем его
+                    task?.cancel()
+                } else {
+                    // Если код совпадает, значит запрос уже выполняется — сообщаем об ошибке
+                    completion(.failure(.invalidRequest))
+                    return
                 }
-                return
-            }
-            
-            guard let httpResponse = response as? HTTPURLResponse else {
-                DispatchQueue.main.async {
-                    completion(.failure(.invalidHTTPResponse))
-                    print("HTTP is wrong")
-                }
-                return
-            }
-            
-            print(httpResponse.statusCode)
-            
-            guard (200..<300).contains(httpResponse.statusCode) else {
-                DispatchQueue.main.async {
-                    completion(.failure(.invalidStatusCode(httpResponse.statusCode)))
-                    print("Error \(httpResponse.statusCode)")
-                }
-                return
-            }
-            
-            guard let data = data else {
-                DispatchQueue.main.async {
-                    completion(.failure(.invalidData))
-                    print("Data is absent")
-                }
-                return
-            }
-            
-            if let jsonString = String(data: data, encoding: .utf8) {
-                print("JSON String: \(jsonString)")
             } else {
-                print("Invalid JSON")
-            }
-            do {
-                let decoder = JSONDecoder()
-                let responseBody = try decoder.decode(OAuthTokenResponseBody.self, from: data)
-                self.storage.token = responseBody.accessToken
-                
-                DispatchQueue.main.async {
-                    completion(.success(responseBody.accessToken))
-                }
-            } catch {
-                DispatchQueue.main.async {
-                    completion(.failure(.decodingFailed(error)))
-                    print(error.localizedDescription)
+                // Если задачи нет, но lastCode уже равен переданному коду — тоже считаем, что повторный запрос не нужен
+                if lastCode == code {
+                    completion(.failure(.invalidRequest))
+                    return
                 }
             }
+            
+            // Запоминаем новый код
+            lastCode = code
+            
+            guard let request = makeOAuthTokenRequest(code: code) else {
+                completion(.failure(.invalidRequest))
+                return
+            }
+            
+            let newTask = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+                // Переключаемся на главный поток для обработки результата
+                DispatchQueue.main.async {
+                    // Обнуляем task и lastCode после завершения запроса
+                    defer {
+                        self?.task = nil
+                        self?.lastCode = nil
+                    }
+                    
+                    if let error = error {
+                        completion(.failure(.networkError(error)))
+                        print(error.localizedDescription)
+                        return
+                    }
+                    
+                    guard let httpResponse = response as? HTTPURLResponse else {
+                        completion(.failure(.invalidHTTPResponse))
+                        print("HTTP is wrong")
+                        return
+                    }
+                    
+                    print(httpResponse.statusCode)
+                    
+                    guard (200..<300).contains(httpResponse.statusCode) else {
+                        completion(.failure(.invalidStatusCode(httpResponse.statusCode)))
+                        print("Error \(httpResponse.statusCode)")
+                        return
+                    }
+                    
+                    guard let data = data else {
+                        completion(.failure(.invalidData))
+                        print("Data is absent")
+                        return
+                    }
+                    
+                    if let jsonString = String(data: data, encoding: .utf8) {
+                        print("JSON String: \(jsonString)")
+                    } else {
+                        print("Invalid JSON")
+                    }
+                    
+                    do {
+                        let decoder = JSONDecoder()
+                        let responseBody = try decoder.decode(OAuthTokenResponseBody.self, from: data)
+                        self?.storage.token = responseBody.accessToken
+                        
+                        completion(.success(responseBody.accessToken))
+                    } catch {
+                        completion(.failure(.decodingFailed(error)))
+                        print(error.localizedDescription)
+                    }
+                }
+            }
+            // Фиксируем новую задачу и запускаем её
+            task = newTask
+            newTask.resume()
         }
-        task.resume()
     }
-    
-}
