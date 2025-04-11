@@ -65,6 +65,10 @@ final class ProfileViewController: UIViewController {
         
         setupUI()
         setupConstraints()
+        
+        if let profile = ProfileService.shared.profile {
+            updateProfileDetails(profile: profile)
+        }
     }
     
     // MARK: - Setup Methods
@@ -100,6 +104,12 @@ final class ProfileViewController: UIViewController {
             bioLabel.topAnchor.constraint(equalTo: usernameLabel.bottomAnchor, constant: 8),
             bioLabel.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor)
         ])
+    }
+    
+    private func updateProfileDetails(profile: ProfileService.Profile) {
+        nameLabel.text = profile.name
+        usernameLabel.text = profile.loginName  // loginName — это username с символом "@"
+        bioLabel.text = profile.bio
     }
     
     // MARK: - Actions
