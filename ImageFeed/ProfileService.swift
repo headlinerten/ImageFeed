@@ -114,7 +114,7 @@ final class ProfileService {
                     completion(.success(profile))
                 } catch {
                     completion(.failure(error))
-                    print("Ошибка декодирования профиля: \(error.localizedDescription)")
+                    print("[ProfileService.fetchProfile]: \(error)")
                 }
             }
         }

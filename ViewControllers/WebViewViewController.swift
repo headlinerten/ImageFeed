@@ -1,5 +1,4 @@
 import UIKit
-import Foundation
 @preconcurrency import WebKit
 
 enum WebViewConstants {
@@ -12,14 +11,22 @@ final class WebViewViewController: UIViewController {
     @IBOutlet private var progressView: UIProgressView!
     @IBOutlet private var backButton: UIButton!
     
+    private var estimatedProgressObservation: NSKeyValueObservation?
+    
     weak var delegate: WebViewViewControllerDelegate?
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        webView.navigationDelegate = self
-        loadAuthView()
+            super.viewDidLoad()
+
+            estimatedProgressObservation = webView.observe(
+                \.estimatedProgress,
+                options: [.new]) { [weak self] _, _ in
+                    self?.updateProgress()
+                }
+
+            webView.navigationDelegate = self
+            loadAuthView()
     }
     
     // MARK: - Actions
@@ -54,17 +61,11 @@ final class WebViewViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        webView.addObserver(
-            self,
-            forKeyPath: #keyPath(WKWebView.estimatedProgress),
-            options: .new,
-            context: nil)
         updateProgress()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        webView.removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), context: nil)
     }
     
     override func observeValue(forKeyPath keyPath: String?,

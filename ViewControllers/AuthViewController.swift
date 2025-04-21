@@ -90,11 +90,11 @@ extension AuthViewController: WebViewViewControllerDelegate {
     // MARK: - Метод для показа ошибки авторизации
     private func showAuthErrorAlert() {
         let alert = UIAlertController(
-            title: "Ошибка авторизации",
-            message: "Не удалось выполнить вход. Попробуйте ещё раз.",
+            title: "Что-то пошло не так",
+            message: "Не удалось войти в систему",
             preferredStyle: .alert
         )
-        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-        present(alert, animated: true, completion: nil)
+        alert.addAction(UIAlertAction(title: "Ок", style: .default))
+        present(alert, animated: true)
     }
 }

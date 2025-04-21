@@ -9,8 +9,8 @@ final class OAuth2Service {
     private init() {}
     
     // MARK: - Защита от гонок
-      private var task: URLSessionTask?
-      private var lastCode: String?
+    private var task: URLSessionTask?
+    private var lastCode: String?
     
     // MARK: - Запрос Токена
     func makeOAuthTokenRequest(code: String) -> URLRequest? {
@@ -54,90 +54,63 @@ final class OAuth2Service {
     
     // MARK: - Получение токена с обработкой гонок
     func fetchAuthToken(code: String, completion: @escaping (Result<String, OAuthError>) -> Void) {
-            // Гарантируем, что вызов происходит из главного потока для безопасного доступа к task и lastCode
-            assert(Thread.isMainThread)
-            
-            // Если уже выполняется запрос
-            if let _ = task {
-                if lastCode != code {
-                    // Если код отличается, предыдущий запрос больше не актуален — отменяем его
-                    task?.cancel()
-                } else {
-                    // Если код совпадает, значит запрос уже выполняется — сообщаем об ошибке
-                    completion(.failure(.invalidRequest))
-                    return
-                }
+        // Гарантируем, что вызов происходит из главного потока для безопасного доступа к task и lastCode
+        assert(Thread.isMainThread)
+        
+        // Если уже выполняется запрос
+        if let _ = task {
+            if lastCode != code {
+                // Если код отличается, предыдущий запрос больше не актуален — отменяем его
+                task?.cancel()
             } else {
-                // Если задачи нет, но lastCode уже равен переданному коду — тоже считаем, что повторный запрос не нужен
-                if lastCode == code {
-                    completion(.failure(.invalidRequest))
-                    return
-                }
-            }
-            
-            // Запоминаем новый код
-            lastCode = code
-            
-            guard let request = makeOAuthTokenRequest(code: code) else {
+                // Если код совпадает, значит запрос уже выполняется — сообщаем об ошибке
                 completion(.failure(.invalidRequest))
                 return
             }
-            
-            let newTask = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
-                // Переключаемся на главный поток для обработки результата
-                DispatchQueue.main.async {
-                    // Обнуляем task и lastCode после завершения запроса
-                    defer {
-                        self?.task = nil
-                        self?.lastCode = nil
-                    }
+        } else {
+            // Если задачи нет, но lastCode уже равен переданному коду — тоже считаем, что повторный запрос не нужен
+            if lastCode == code {
+                completion(.failure(.invalidRequest))
+                return
+            }
+        }
+        
+        // Запоминаем новый код
+        lastCode = code
+        
+        guard let request = makeOAuthTokenRequest(code: code) else {
+            completion(.failure(.invalidRequest))
+            return
+        }
+        
+        let newTask = URLSession.shared.objectTask(
+            for: request
+        ) { [weak self] (result: Result<OAuthTokenResponseBody, Error>) in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                defer {
+                    self.task = nil
+                    self.lastCode = nil
+                }
+                
+                switch result {
+                case .success(let body):
+                    self.storage.token = body.accessToken
+                    completion(.success(body.accessToken))
                     
-                    if let error = error {
-                        completion(.failure(.networkError(error)))
-                        print(error.localizedDescription)
-                        return
-                    }
+                case .failure(let error):
+                    print("[OAuth2Service.fetchAuthToken]: \(error)")
                     
-                    guard let httpResponse = response as? HTTPURLResponse else {
-                        completion(.failure(.invalidHTTPResponse))
-                        print("HTTP is wrong")
-                        return
-                    }
-                    
-                    print(httpResponse.statusCode)
-                    
-                    guard (200..<300).contains(httpResponse.statusCode) else {
-                        completion(.failure(.invalidStatusCode(httpResponse.statusCode)))
-                        print("Error \(httpResponse.statusCode)")
-                        return
-                    }
-                    
-                    guard let data = data else {
-                        completion(.failure(.invalidData))
-                        print("Data is absent")
-                        return
-                    }
-                    
-                    if let jsonString = String(data: data, encoding: .utf8) {
-                        print("JSON String: \(jsonString)")
-                    } else {
-                        print("Invalid JSON")
-                    }
-                    
-                    do {
-                        let decoder = JSONDecoder()
-                        let responseBody = try decoder.decode(OAuthTokenResponseBody.self, from: data)
-                        self?.storage.token = responseBody.accessToken
-                        
-                        completion(.success(responseBody.accessToken))
-                    } catch {
+                    if error is DecodingError {
                         completion(.failure(.decodingFailed(error)))
-                        print(error.localizedDescription)
+                    } else {
+                        completion(.failure(.networkError(error)))
                     }
                 }
             }
-            // Фиксируем новую задачу и запускаем её
-            task = newTask
-            newTask.resume()
         }
+        
+        task = newTask
+        newTask.resume()
     }
+}

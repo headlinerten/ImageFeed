@@ -7,6 +7,7 @@ final class SplashViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        // Если токен уже есть – загружаем профиль
         if let token = storage.token {
             fetchProfile(token: token)
         } else {
@@ -25,6 +26,9 @@ final class SplashViewController: UIViewController {
             switch result {
             case .success(let profile):
                 print("Профиль получен: \(profile)")
+                // Запускаем запрос аватарки
+                ProfileImageService.shared.fetchProfileImageURL(username: profile.username) { _ in }
+                // После получения профиля переходим на TabBarController (главный экран)
                 self.switchTabBarController()
             case .failure(let error):
                 print("Ошибка получения профиля: \(error)")

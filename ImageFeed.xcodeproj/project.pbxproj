@@ -48,6 +48,11 @@
 			path = ImageFeed;
 			sourceTree = "<group>";
 		};
+		205868832DA8ABD500B950FF /* ProfileImageService */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ProfileImageService;
+			sourceTree = "<group>";
+		};
 		20A6CA6B2D98F12C00421E3F /* Auth */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Auth;
@@ -75,6 +80,7 @@
 		2023CFCD2D17384400EAC095 = {
 			isa = PBXGroup;
 			children = (
+				205868832DA8ABD500B950FF /* ProfileImageService */,
 				20A6CA722D98F13800421E3F /* ImagesList */,
 				20A6CA6B2D98F12C00421E3F /* Auth */,
 				2007261C2D87DD9A003EBA41 /* ViewControllers */,
@@ -113,6 +119,7 @@
 				200726172D87DCD9003EBA41 /* Protocols */,
 				2007261C2D87DD9A003EBA41 /* ViewControllers */,
 				2023CFD82D17384400EAC095 /* ImageFeed */,
+				205868832DA8ABD500B950FF /* ProfileImageService */,
 				20A6CA6B2D98F12C00421E3F /* Auth */,
 				20A6CA722D98F13800421E3F /* ImagesList */,
 			);
