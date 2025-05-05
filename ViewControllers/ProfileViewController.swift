@@ -1,4 +1,5 @@
 import UIKit
+import Kingfisher
 
 final class ProfileViewController: UIViewController {
     // MARK: - UI Elements
@@ -7,7 +8,7 @@ final class ProfileViewController: UIViewController {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "avatar")
         imageView.tintColor = .gray
-        
+        imageView.clipsToBounds = true
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
@@ -84,6 +85,29 @@ final class ProfileViewController: UIViewController {
                 updateAvatar()
     }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        profileImageView.layer.cornerRadius = profileImageView.bounds.width / 2
+    }
+    
+    // MARK: - Avatar
+    private func updateAvatar() {
+            guard
+                let urlString = ProfileImageService.shared.avatarURL,
+                let url       = URL(string: urlString)
+            else { return }
+
+            // Kingfisher: грузим, кэшируем, анимируем появление
+            profileImageView.kf.setImage(
+                with: url,
+                placeholder: UIImage(named: "avatar"),
+                options: [
+                    .transition(.fade(0.25)),   // плавное проявление
+                    .cacheOriginalImage         // кладём полную картинку в кэш
+                ]
+            )
+        }
+    
     // MARK: - Setup Methods
     
     private func setupUI() {
@@ -124,14 +148,7 @@ final class ProfileViewController: UIViewController {
         usernameLabel.text = profile.loginName  // loginName — это username с символом "@"
         bioLabel.text = profile.bio
     }
-    
-    private func updateAvatar() {
-            guard
-                let profileImageURL = ProfileImageService.shared.avatarURL,
-                let url = URL(string: profileImageURL)
-        else { return }
-    }
-    
+
     // MARK: - Actions
     
     @objc

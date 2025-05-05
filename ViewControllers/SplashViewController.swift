@@ -3,17 +3,41 @@ final class SplashViewController: UIViewController {
     
     private let storage = OAuth2TokenStorage()
     private let profileService = ProfileService.shared
-    private let showAuthenticationScreenSegueIdentifier = "showAuthenticationScreen"
     
+    private let logoImageView: UIImageView = {
+        let iv = UIImageView(image: UIImage(named: "splash_screen_logo"))
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        return iv
+    }()
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        view.backgroundColor = .black
+        view.addSubview(logoImageView)
+
+        NSLayoutConstraint.activate([
+            logoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            logoImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
+    }
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        // Если токен уже есть – загружаем профиль
+
         if let token = storage.token {
             fetchProfile(token: token)
         } else {
-            // Если токена нет, переходим на экран авторизации
-            performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
+            presentAuth()
         }
+    }
+    private func presentAuth() {
+        let storyboard = UIStoryboard(name: "Main", bundle: .main)
+        let nav = storyboard.instantiateViewController(withIdentifier: "AuthNavigationController") as! UINavigationController
+        let authVC = nav.viewControllers.first as! AuthViewController
+        authVC.delegate = self
+        nav.modalPresentationStyle = .fullScreen
+        present(nav, animated: true)
     }
     
     // MARK: - Получение профиля
@@ -52,22 +76,6 @@ final class SplashViewController: UIViewController {
     }
 }
 
-extension SplashViewController {
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == showAuthenticationScreenSegueIdentifier {
-            guard let navigationController = segue.destination as? UINavigationController,
-                  let authViewController = navigationController.viewControllers.first as? AuthViewController else {
-                assertionFailure("Не удалось перейти на AuthViewController")
-                return
-            }
-            authViewController.delegate = self
-            print("delegate in SplashViewController: \(self)")
-            print("delegate AuthViewController: \(String(describing: authViewController.delegate))")
-        } else {
-            super.prepare(for: segue, sender: sender)
-        }
-    }
-}
 
 // MARK: - AuthViewControllerDelegate
 extension SplashViewController: AuthViewControllerDelegate {
