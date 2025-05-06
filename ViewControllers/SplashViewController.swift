@@ -31,10 +31,19 @@ final class SplashViewController: UIViewController {
             presentAuth()
         }
     }
+    
     private func presentAuth() {
         let storyboard = UIStoryboard(name: "Main", bundle: .main)
-        let nav = storyboard.instantiateViewController(withIdentifier: "AuthNavigationController") as! UINavigationController
-        let authVC = nav.viewControllers.first as! AuthViewController
+
+        guard
+            let nav = storyboard.instantiateViewController(withIdentifier: "AuthNavigationController")
+                as? UINavigationController,
+            let authVC = nav.viewControllers.first as? AuthViewController
+        else {
+            assertionFailure("AuthNavigationController не найден в storyboard")
+            return
+        }
+
         authVC.delegate = self
         nav.modalPresentationStyle = .fullScreen
         present(nav, animated: true)
