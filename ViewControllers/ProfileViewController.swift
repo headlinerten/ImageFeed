@@ -1,4 +1,5 @@
 import UIKit
+import Kingfisher
 
 final class ProfileViewController: UIViewController {
     // MARK: - UI Elements
@@ -7,7 +8,7 @@ final class ProfileViewController: UIViewController {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "avatar")
         imageView.tintColor = .gray
-        
+        imageView.clipsToBounds = true
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
@@ -51,6 +52,8 @@ final class ProfileViewController: UIViewController {
         return button
     }()
     
+    private var profileImageServiceObserver: NSObjectProtocol?
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -65,7 +68,45 @@ final class ProfileViewController: UIViewController {
         
         setupUI()
         setupConstraints()
+        
+        if let profile = ProfileService.shared.profile {
+            updateProfileDetails(profile: profile)
+        }
+        
+        profileImageServiceObserver = NotificationCenter.default
+                    .addObserver(
+                        forName: ProfileImageService.didChangeNotification,
+                        object: nil,
+                        queue: .main
+                    ) { [weak self] _ in
+                        guard let self = self else { return }
+                        self.updateAvatar()
+                    }
+                updateAvatar()
     }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        profileImageView.layer.cornerRadius = profileImageView.bounds.width / 2
+    }
+    
+    // MARK: - Avatar
+    private func updateAvatar() {
+            guard
+                let urlString = ProfileImageService.shared.avatarURL,
+                let url       = URL(string: urlString)
+            else { return }
+
+            // Kingfisher: грузим, кэшируем, анимируем появление
+            profileImageView.kf.setImage(
+                with: url,
+                placeholder: UIImage(named: "avatar"),
+                options: [
+                    .transition(.fade(0.25)),   // плавное проявление
+                    .cacheOriginalImage         // кладём полную картинку в кэш
+                ]
+            )
+        }
     
     // MARK: - Setup Methods
     
@@ -102,6 +143,12 @@ final class ProfileViewController: UIViewController {
         ])
     }
     
+    private func updateProfileDetails(profile: ProfileService.Profile) {
+        nameLabel.text = profile.name
+        usernameLabel.text = profile.loginName  // loginName — это username с символом "@"
+        bioLabel.text = profile.bio
+    }
+
     // MARK: - Actions
     
     @objc
