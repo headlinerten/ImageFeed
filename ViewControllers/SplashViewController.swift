@@ -13,7 +13,7 @@ final class SplashViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.backgroundColor = .ypBlack
+        view.backgroundColor = .black
         view.addSubview(logoImageView)
 
         NSLayoutConstraint.activate([
