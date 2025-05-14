@@ -17,7 +17,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		2023CFE82D17384500EAC095 /* Exceptions for "ImageFeed" folder in "ImageFeed" target */ = {
+		200453362DCC6574006ED22F /* Exceptions for "ImageFeed" folder in "ImageFeed" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -27,6 +27,11 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		200453302DCC5B5F006ED22F /* ImagesListService */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ImagesListService;
+			sourceTree = "<group>";
+		};
 		200726142D87DC42003EBA41 /* Constants */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Constants;
@@ -50,7 +55,7 @@
 		2023CFD82D17384400EAC095 /* ImageFeed */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				2023CFE82D17384500EAC095 /* Exceptions for "ImageFeed" folder in "ImageFeed" target */,
+				200453362DCC6574006ED22F /* Exceptions for "ImageFeed" folder in "ImageFeed" target */,
 			);
 			path = ImageFeed;
 			sourceTree = "<group>";
@@ -68,6 +73,11 @@
 		20A6CA722D98F13800421E3F /* ImagesList */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = ImagesList;
+			sourceTree = "<group>";
+		};
+		20F1CDE82DD41330002F747A /* ProfileLogoutService */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ProfileLogoutService;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -89,6 +99,8 @@
 		2023CFCD2D17384400EAC095 = {
 			isa = PBXGroup;
 			children = (
+				20F1CDE82DD41330002F747A /* ProfileLogoutService */,
+				200453302DCC5B5F006ED22F /* ImagesListService */,
 				200D250F2DC8698100B4F1F9 /* TabBarController */,
 				205868832DA8ABD500B950FF /* ProfileImageService */,
 				20A6CA722D98F13800421E3F /* ImagesList */,
@@ -125,6 +137,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				200453302DCC5B5F006ED22F /* ImagesListService */,
 				200726142D87DC42003EBA41 /* Constants */,
 				200726172D87DCD9003EBA41 /* Protocols */,
 				2007261C2D87DD9A003EBA41 /* ViewControllers */,
@@ -133,6 +146,7 @@
 				205868832DA8ABD500B950FF /* ProfileImageService */,
 				20A6CA6B2D98F12C00421E3F /* Auth */,
 				20A6CA722D98F13800421E3F /* ImagesList */,
+				20F1CDE82DD41330002F747A /* ProfileLogoutService */,
 			);
 			name = ImageFeed;
 			packageProductDependencies = (

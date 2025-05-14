@@ -42,11 +42,7 @@ final class ProfileViewController: UIViewController {
     
     private let logoutButton: UIButton = {
         let image = UIImage(systemName: "ipad.and.arrow.forward")
-        let button = UIButton.systemButton(
-            with: image ?? UIImage(),
-            target: nil,
-            action: nil
-        )
+        let button = UIButton.systemButton(with: image ?? UIImage(), target: nil, action: nil)
         button.tintColor = .ypRed
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -74,15 +70,15 @@ final class ProfileViewController: UIViewController {
         }
         
         profileImageServiceObserver = NotificationCenter.default
-                    .addObserver(
-                        forName: ProfileImageService.didChangeNotification,
-                        object: nil,
-                        queue: .main
-                    ) { [weak self] _ in
-                        guard let self = self else { return }
-                        self.updateAvatar()
-                    }
-                updateAvatar()
+            .addObserver(
+                forName: ProfileImageService.didChangeNotification,
+                object: nil,
+                queue: .main
+            ) { [weak self] _ in
+                guard let self = self else { return }
+                self.updateAvatar()
+            }
+        updateAvatar()
     }
     
     override func viewDidLayoutSubviews() {
@@ -92,21 +88,21 @@ final class ProfileViewController: UIViewController {
     
     // MARK: - Avatar
     private func updateAvatar() {
-            guard
-                let urlString = ProfileImageService.shared.avatarURL,
-                let url       = URL(string: urlString)
-            else { return }
-
-            // Kingfisher: грузим, кэшируем, анимируем появление
-            profileImageView.kf.setImage(
-                with: url,
-                placeholder: UIImage(named: "avatar"),
-                options: [
-                    .transition(.fade(0.25)),   // плавное проявление
-                    .cacheOriginalImage         // кладём полную картинку в кэш
-                ]
-            )
-        }
+        guard
+            let urlString = ProfileImageService.shared.avatarURL,
+            let url       = URL(string: urlString)
+        else { return }
+        
+        // Kingfisher: грузим, кэшируем, анимируем появление
+        profileImageView.kf.setImage(
+            with: url,
+            placeholder: UIImage(named: "avatar"),
+            options: [
+                .transition(.fade(0.25)),   // плавное проявление
+                .cacheOriginalImage         // кладём полную картинку в кэш
+            ]
+        )
+    }
     
     // MARK: - Setup Methods
     
@@ -115,6 +111,7 @@ final class ProfileViewController: UIViewController {
             $0.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview($0)
         }
+        logoutButton.addTarget(self, action: #selector(didTapLogout), for: .touchUpInside)
     }
     
     private func setupConstraints() {
@@ -148,11 +145,21 @@ final class ProfileViewController: UIViewController {
         usernameLabel.text = profile.loginName  // loginName — это username с символом "@"
         bioLabel.text = profile.bio
     }
-
+    
     // MARK: - Actions
     
     @objc
     private func didTapLogout() {
-        // Логика выхода
+        let alert = UIAlertController(
+            title: "Выход",
+            message: "Вы уверены, что хотите выйти?",
+            preferredStyle: .actionSheet)
+        
+        alert.addAction(UIAlertAction(title: "Да, выйти", style: .destructive) { _ in
+            ProfileLogoutService.shared.logout()
+        })
+        alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
+        
+        present(alert, animated: true)
     }
 }

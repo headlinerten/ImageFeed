@@ -122,3 +122,12 @@ final class ProfileService {
         newTask.resume()
     }
 }
+
+extension ProfileService {
+    func reset() {
+        profile = nil
+        task?.cancel()
+        task = nil
+        lastToken = nil
+    }
+}
