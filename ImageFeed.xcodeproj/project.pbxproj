@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		205FE5712DD66B42006EBC9F /* WebViewPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 205FE5702DD66B42006EBC9F /* WebViewPresenter.swift */; };
 		207F63532DCAB2DF0018A25A /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 207F63522DCAB2DF0018A25A /* Kingfisher */; };
 		20A6CAA22D9903E100421E3F /* ProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = 20A6CAA12D9903E100421E3F /* ProgressHUD */; };
 		20BDCDEB2DC861A400B207F1 /* SwiftKeychainWrapper in Frameworks */ = {isa = PBXBuildFile; productRef = 20BDCDEA2DC861A400B207F1 /* SwiftKeychainWrapper */; };
@@ -14,6 +15,7 @@
 
 /* Begin PBXFileReference section */
 		2023CFD62D17384400EAC095 /* ImageFeed.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ImageFeed.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		205FE5702DD66B42006EBC9F /* WebViewPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewPresenter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -99,6 +101,8 @@
 		2023CFCD2D17384400EAC095 = {
 			isa = PBXGroup;
 			children = (
+				205FE56F2DD66B12006EBC9F /* WebViewPresenter */,
+				205FE56A2DD669B9006EBC9F /* New Group */,
 				20F1CDE82DD41330002F747A /* ProfileLogoutService */,
 				200453302DCC5B5F006ED22F /* ImagesListService */,
 				200D250F2DC8698100B4F1F9 /* TabBarController */,
@@ -119,6 +123,21 @@
 				2023CFD62D17384400EAC095 /* ImageFeed.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		205FE56A2DD669B9006EBC9F /* New Group */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "New Group";
+			sourceTree = "<group>";
+		};
+		205FE56F2DD66B12006EBC9F /* WebViewPresenter */ = {
+			isa = PBXGroup;
+			children = (
+				205FE5702DD66B42006EBC9F /* WebViewPresenter.swift */,
+			);
+			path = WebViewPresenter;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -212,6 +231,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				205FE5712DD66B42006EBC9F /* WebViewPresenter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -22,16 +22,17 @@ final class AuthViewController: UIViewController {
     
     // MARK: - Navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == showWebViewSegueIdentifier {
-            
-            guard let webViewViewController = segue.destination as? WebViewViewController else {
-                assertionFailure()
-                return
-            }
-            webViewViewController.delegate = self
-        } else {
+        guard segue.identifier == showWebViewSegueIdentifier,
+              let webVC = segue.destination as? WebViewViewController
+        else {
             super.prepare(for: segue, sender: sender)
+            return
         }
+        
+        let presenter = WebViewPresenter()
+        webVC.presenter = presenter
+        presenter.view = webVC
+        webVC.delegate = self
     }
 }
 
