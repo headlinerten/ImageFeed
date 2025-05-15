@@ -133,3 +133,12 @@ final class ProfileImageService {
         newTask.resume()
     }
 }
+
+extension ProfileImageService {
+    func reset() {
+        avatarURL = nil
+        task?.cancel()
+        task = nil
+        lastUsername = nil
+    }
+}
