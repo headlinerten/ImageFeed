@@ -1,4 +1,4 @@
-import UIKit
+import Foundation
 
 // MARK: - DTO, приходящий из сети (строго под JSON)
 struct PhotoResult: Decodable {
@@ -15,13 +15,17 @@ struct PhotoResult: Decodable {
         let full: String
     }
     
+    private static let dateFormatter: ISO8601DateFormatter = {
+       ISO8601DateFormatter()
+    }()
+    
     // конвертация в UI‑модель
     func toUIModel() -> Photo {
-        let date = ISO8601DateFormatter().date(from: created_at ?? "")
+        let createdDate = Self.dateFormatter.date(from: created_at ?? "")
         return Photo(
             id: id,
             size: CGSize(width: width, height: height),
-            createdAt: date,
+            createdAt: createdDate,
             description: description,
             thumbImageURL: urls.thumb,
             largeImageURL: urls.full,

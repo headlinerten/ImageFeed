@@ -80,9 +80,15 @@ extension ImagesListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView,
                    cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 
-        let cell = tableView.dequeueReusableCell(
-            withIdentifier: ImagesListCell.reuseIdentifier,
-            for: indexPath) as! ImagesListCell
+        guard
+            let cell = tableView.dequeueReusableCell(
+                withIdentifier: ImagesListCell.reuseIdentifier,
+                for: indexPath
+            ) as? ImagesListCell
+        else {
+            return UITableViewCell()
+        }
+
         cell.delegate = self
         cell.configure(with: photos[indexPath.row])
         return cell
