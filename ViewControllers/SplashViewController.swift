@@ -52,7 +52,7 @@ final class SplashViewController: UIViewController {
     // MARK: - Получение профиля
     private func fetchProfile(token: String) {
         UIBlockingProgressHUD.show()
-        profileService.fetchProfile(token: token) { [weak self] result in
+        profileService.fetchProfileInfo(token: token) { [weak self] result in
             UIBlockingProgressHUD.dismiss()
             guard let self = self else { return }
             

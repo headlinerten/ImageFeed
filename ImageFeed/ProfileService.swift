@@ -1,133 +1,115 @@
-import UIKit
+import Foundation
 
-final class ProfileService {
-    // MARK: - Singleton
-    static let shared = ProfileService()
-    private init() {}
+// MARK: - Модель данных для профиля
+struct ProfileResult: Codable {
+    let username: String
+    let name: String?
+    let firstName: String?
+    let lastName: String?
+    let bio: String?
     
-    // MARK: - Храним полученный профиль для UI
-    private(set) var profile: Profile?
     
-    // MARK: - Переменные для защиты от гонок при выполнении запроса
-    private var task: URLSessionTask?
-    private var lastToken: String?
-    
-    // MARK: - Ошибки ProfileService
-    enum ProfileError: Error {
-        case invalidURL
-        case invalidResponse
-        case noData
-    }
-    
-    // MARK: - Модель для декодирования ответа Unsplash GET /me
-    struct ProfileResult: Codable {
-        let username: String
-        let firstName: String?
-        let lastName: String?
-        let bio: String?
-        
-        private enum CodingKeys: String, CodingKey {
-            case username
-            case firstName = "first_name"
-            case lastName = "last_name"
-            case bio
-        }
-    }
-    
-    // MARK: - Модель для UI
-    struct Profile {
-        let username: String
-        let name: String
-        let loginName: String
-        let bio: String?
-    }
-    
-    // MARK: - Получение профиля
-    /// Метод fetchProfile выполняет GET-запрос к https://api.unsplash.com/me,
-    /// устанавливая в заголовок HTTP авторизацию через Bearer token.
-    /// Если уже выполняется предыдущий запрос, он будет отменён, чтобы избежать гонок.
-    func fetchProfile(token: String, completion: @escaping (Result<Profile, Error>) -> Void) {
-        // Если есть выполняющаяся задача, отменяем её
-        if let task = task {
-            task.cancel()
-        }
-        lastToken = token
-        
-        guard let url = URL(string: "https://api.unsplash.com/me") else {
-            completion(.failure(ProfileError.invalidURL))
-            return
-        }
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        // Добавляем заголовок с авторизационным токеном
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        
-        let newTask = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
-            // Обработка результата на главном потоке
-            DispatchQueue.main.async {
-                defer {
-                    self?.task = nil
-                    self?.lastToken = nil
-                }
-                
-                if let error = error {
-                    completion(.failure(error))
-                    print("Ошибка получения профиля: \(error.localizedDescription)")
-                    return
-                }
-                
-                guard let httpResponse = response as? HTTPURLResponse,
-                      (200..<300).contains(httpResponse.statusCode) else {
-                    completion(.failure(ProfileError.invalidResponse))
-                    print("Неверный HTTP ответ при получении профиля")
-                    return
-                }
-                
-                guard let data = data else {
-                    completion(.failure(ProfileError.noData))
-                    print("Данные профиля отсутствуют")
-                    return
-                }
-                
-                do {
-                    let decoder = JSONDecoder()
-                    let profileResult = try decoder.decode(ProfileResult.self, from: data)
-                    // Формируем полное имя из first_name и last_name
-                    let name: String
-                    if let firstName = profileResult.firstName, let lastName = profileResult.lastName {
-                        name = "\(firstName) \(lastName)"
-                    } else if let firstName = profileResult.firstName {
-                        name = firstName
-                    } else if let lastName = profileResult.lastName {
-                        name = lastName
-                    } else {
-                        name = ""
-                    }
-                    // Формируем модель для UI
-                    let profile = Profile(
-                        username: profileResult.username,
-                        name: name,
-                        loginName: "@\(profileResult.username)",
-                        bio: profileResult.bio
-                    )
-                    self?.profile = profile
-                    completion(.success(profile))
-                } catch {
-                    completion(.failure(error))
-                    print("[ProfileService.fetchProfile]: \(error)")
-                }
-            }
-        }
-        self.task = newTask
-        newTask.resume()
+    enum CodingKeys: String, CodingKey {
+        case username
+        case name
+        case firstName = "first_name"
+        case lastName = "last_name"
+        case bio
     }
 }
 
-extension ProfileService {
-    func reset() {
-        profile = nil
-        task?.cancel()
-        task = nil
-        lastToken = nil
+struct Profile: Equatable {
+    let username: String
+    let name: String
+    let loginName: String
+    let bio: String?
+    
+    init(profileResult: ProfileResult) {
+        self.username = profileResult.username
+        self.name = [profileResult.firstName, profileResult.lastName] .compactMap { $0 }.joined(separator: " ")
+        self.loginName = "@\(profileResult.username)"
+        self.bio = profileResult.bio
     }
+}
+// MARK: - Ошибки сети для профиля
+enum ProfileNetworkError: Error {
+    case requestCancelled
+    case urlSessionError
+    case urlSessionRequestError
+    case missingToken
+}
+
+final class ProfileService {
+    
+    private var currentTask: URLSessionTask?
+    static var shared = ProfileService()
+    private init() {}
+   var profile: Profile? {
+        didSet {
+            NotificationCenter.default.post(
+                name: ProfileService.didChangeNotification,
+                object: self
+            )
+        }
+    }
+    static let didChangeNotification = Notification.Name("ProfileServiceDidChange")
+    
+    func updateProfile(_ profile: Profile) {
+        self.profile = profile
+        NotificationCenter.default.post(name: ProfileService.didChangeNotification, object: nil)
+    }
+    // MARK: - Создание запроса с авторизацией
+    private func createAuthRequest(url: URL, token: String) -> URLRequest? {
+        print("[ProfileService|createAuthRequest]: Создаём запрос с токеном: \(token)")
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        return request
+    }
+    func clearProfile() {
+        profile = nil
+        NotificationCenter.default.post(name: ProfileService.didChangeNotification, object: self)
+        print("Профиль удален")
+    }
+    
+    // MARK: - Запрос профиля пользователя
+    func fetchProfileInfo(token: String, completion: @escaping (Result<Profile, Error>) -> Void) {
+        
+        print("[ProfileService|fetchProfile]: Отправка запроса...")
+        
+        guard let url = URL(string: "https://api.unsplash.com/me") else {
+            print("[ProfileService|fetchProfile]: Ошибка интернет соединения - не создаётся URL")
+            completion(.failure(ProfileNetworkError.urlSessionError))
+            return
+        }
+        
+        
+        print("URL successfully created: \(url)")
+        guard let request = createAuthRequest(url: url, token: token) else {
+            print("[ProfileService|fetchProfile]: Ошибка интернет соединения - не создаётся URLRequest")
+            completion(.failure(ProfileNetworkError.requestCancelled))
+            return
+        }
+        
+        let task = URLSession.shared.objectTask(for: request) { [weak self] (result: Result<ProfileResult, Error>) in
+            switch result {
+            case .success(let profileResult):
+                print("[ProfileService|fetchProfile]: Данные успешно декодированы: \(profileResult)")
+                let profile = Profile(profileResult: profileResult)
+                self?.profile = profile
+                completion(.success(profile))
+                ProfileImageService.shared.fetchProfileImageURL(username: profile.username) { _ in }
+                
+            case .failure(let error):
+                print("[ProfileService|fetchProfile]: Ошибка декодирования - \(error.localizedDescription)")
+                completion(.failure(error))
+            }
+        }
+        self.currentTask = task
+        task.resume()
+    }
+    
+    func reset() {
+            profile = nil
+        }
 }
