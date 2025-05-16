@@ -69,9 +69,7 @@ extension WebViewViewController: WKNavigationDelegate {
                  decidePolicyFor navigationAction: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
 
-        if let code = code(from: navigationAction) {
-            // здесь прежний делегатский вызов / переход дальше
-            // delegate?.didAuthenticateWithCode(code)  <-- как было у вас
+        if code(from: navigationAction) != nil {
         }
         decisionHandler(.allow)
     }
