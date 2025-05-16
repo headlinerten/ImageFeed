@@ -52,7 +52,7 @@ class ImageFeedUITests: XCTestCase {
         let webView = app.webViews.firstMatch
         XCTAssertTrue(waitForElement(webView, timeout: 15), "Веб-вью не найдено")
         
-        UIPasteboard.general.string = "headlinerten@gmail.com"
+        UIPasteboard.general.string = " "
         let loginTextField = webView.textFields.firstMatch
         XCTAssertTrue(waitForElement(loginTextField, timeout: 10), "Поле для ввода логина не найдено")
         loginTextField.tap()
@@ -61,7 +61,7 @@ class ImageFeedUITests: XCTestCase {
         
         webView.swipeUp()
         
-        UIPasteboard.general.string = "Elista2191"
+        UIPasteboard.general.string = " "
         let passwordTextField = webView.secureTextFields.firstMatch
         XCTAssertTrue(waitForElement(passwordTextField, timeout: 10), "Поле для ввода пароля не найдено")
         passwordTextField.tap()
@@ -142,14 +142,14 @@ class ImageFeedUITests: XCTestCase {
         profileTab.tap()
         
         // Проверяем наличие и текст метки имени
-        let nameLabel = app.staticTexts["Tenzin Sangadzhiev"]
+        let nameLabel = app.staticTexts[" "]
         XCTAssertTrue(waitForElement(nameLabel, timeout: 10), "Метка имени не найдена")
         XCTAssertEqual(nameLabel.label, "Tenzin Sangadzhiev", "Текст метки имени не соответствует ожидаемому")
         
         // Проверяем наличие и текст метки логина
-        let loginLabel = app.staticTexts["@headlinerten"]
+        let loginLabel = app.staticTexts["@ "]
         XCTAssertTrue(waitForElement(loginLabel, timeout: 10), "Метка логина не найдена")
-        XCTAssertEqual(loginLabel.label, "@headlinerten", "Текст метки логина не соответствует ожидаемому")
+        XCTAssertEqual(loginLabel.label, "@ ", "Текст метки логина не соответствует ожидаемому")
         
         // Проверяем наличие и текст метки описания
         let descriptionLabel = app.staticTexts["Нет описания"]
