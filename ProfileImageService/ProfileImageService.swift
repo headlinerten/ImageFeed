@@ -11,7 +11,7 @@ final class ProfileImageService {
     private var lastUsername: String?
     
     // MARK: - Храним URL аватарки, полученной при успешном запросе
-    private(set) var avatarURL: String?
+    var avatarURL: String?
     
     // MARK: - Модель для декодирования ответа GET /users/:username
     struct UserResult: Codable {

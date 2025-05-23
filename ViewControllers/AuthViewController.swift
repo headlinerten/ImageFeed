@@ -12,6 +12,8 @@ final class AuthViewController: UIViewController {
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
+        entryButton.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: .bold)
+        entryButton.accessibilityIdentifier = "Authenticate"
         super.viewDidLoad()
         configureBackButton()
     }
@@ -23,12 +25,19 @@ final class AuthViewController: UIViewController {
     // MARK: - Navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == showWebViewSegueIdentifier {
-            
-            guard let webViewViewController = segue.destination as? WebViewViewController else {
-                assertionFailure()
+            guard
+                let webVC = segue.destination as? WebViewViewController
+            else {
+                assertionFailure("Не удалось подготовить \(showWebViewSegueIdentifier)")
                 return
             }
-            webViewViewController.delegate = self
+
+            // Инъекция хелпера и презентера
+            let authHelper = AuthHelper()
+            let presenter = WebViewPresenter(authHelper: authHelper)
+            webVC.presenter = presenter
+            presenter.view = webVC
+            webVC.delegate = self
         } else {
             super.prepare(for: segue, sender: sender)
         }
